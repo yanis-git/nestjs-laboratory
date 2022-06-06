@@ -1,0 +1,19 @@
+
+# @name Sign in as a user Yanis
+POST http://localhost:3000/auth/sign-in
+Content-Type: application/json
+
+{
+  "email": "yanis.ghidouche@gmail.com",
+  "password": "123456"
+}
+
+####
+# @name Sign up as a user Yanis
+POST http://localhost:3000/auth/sign-up
+Content-Type: application/json
+
+{
+  "email": "yanis.ghidouche@gmail.com",
+  "password": "123456"
+}
