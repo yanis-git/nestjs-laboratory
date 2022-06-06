@@ -1,23 +1,22 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../orm/prisma.service';
-import { AuthDto } from './dto';
+import { AuthDto } from '../dto';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { UserRepository } from '../../orm/repositories/user.repository';
+import { JwtService } from './jwt.service';
 
 @Injectable()
 export class AuthService {
-  private select: { [key: string]: boolean } = { id: true, email: true };
-
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private userRepository: UserRepository,
+    private jwtService: JwtService,
+  ) {}
 
   async signUp(user: AuthDto): Promise<{ id: string; email: string }> {
     let entity;
     try {
       const hashedPassword = await argon.hash(user.password);
-      entity = await this.prismaService.user.create({
-        data: { ...user, password: hashedPassword },
-        select: { ...this.select },
-      });
+      entity = await this.userRepository.register(user.email, hashedPassword);
     } catch (error) {
       if (
         error instanceof PrismaClientKnownRequestError &&
@@ -29,16 +28,12 @@ export class AuthService {
     return entity;
   }
 
-  async signIn(user: AuthDto): Promise<{ id: string; email: string }> {
-    const entity = await this.prismaService.user.findUnique({
-      where: { email: user.email },
-    });
+  async signIn(user: AuthDto): Promise<string> {
+    const entity = await this.userRepository.findByEmail(user.email);
     // verify entity exist and password match.
     if (!entity || !(await argon.verify(entity.password, user.password))) {
       throw new ForbiddenException('Invalid password');
     }
-    // for now, we simply delete password. find a better solution later
-    delete entity.password;
-    return entity;
+    return await this.jwtService.sign(entity.id, entity.email);
   }
 }

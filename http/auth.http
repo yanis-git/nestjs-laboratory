@@ -1,5 +1,6 @@
 
 # @name Sign in as a user Yanis
+# {"token": "<token value>"}
 POST http://localhost:3000/auth/sign-in
 Content-Type: application/json
 
@@ -7,6 +8,8 @@ Content-Type: application/json
   "email": "yanis.ghidouche@gmail.com",
   "password": "123456"
 }
+
+> {% client.global.set("auth_token", response.body.token) %}
 
 ####
 # @name Sign up as a user Yanis

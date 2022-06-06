@@ -1,0 +1,5 @@
+
+# @name Sign in as a user Yanis
+GET  http://localhost:3000/bookmarks
+Authorization: Bearer {{auth_token}}
+
