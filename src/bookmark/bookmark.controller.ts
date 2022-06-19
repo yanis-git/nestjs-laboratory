@@ -1,11 +1,13 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from '../auth/guard';
+import { CurrentUser } from '../auth/decorator';
+import { User } from '@prisma/client';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtGuard)
 @Controller('bookmarks')
 export class BookmarkController {
   @Get()
-  getAll() {
-    return 'This action returns all bookmarks for current user';
+  getAll(@CurrentUser() user: User) {
+    return user;
   }
 }

@@ -6,6 +6,12 @@ import { User } from '@prisma/client';
 export class UserRepository {
   constructor(private prisma: PrismaService) {}
 
+  async findById(id: string): Promise<User> {
+    return await this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
   async findByEmail(
     email: string,
     select?: { [key: string]: boolean },
